@@ -17,7 +17,7 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
-import util
+import util, pdb
 
 class SearchProblem:
     """
@@ -87,19 +87,117 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
+    closed = set()
+    startMoves = problem.getSuccessors(problem.getStartState())
+    fringe = util.Stack()
+    closed.add(problem.getStartState())
+    
+    # Set p the initial fringe set
+    for move in startMoves: fringe.push([move,[move[1]]])
+
+    # initialize the "foundSolution" bool
+    foundSolution = False
+
+    # if the startState is the goal, don't have to move at all 
+    if problem.isGoalState(problem.getStartState()):
+        return []
+
+    # what to do at each iteration..
+    while not foundSolution and len(fringe.list) > 0:
+        # Grab out the last added node..
+        currentNode = fringe.pop()
+        node = currentNode[0][0]
+        dirList = currentNode[1]
+
+        if problem.isGoalState(node):
+            print dirList
+            foundSolution = True
+        else:
+            if node not in closed:
+                closed.add(node)
+                kids = problem.getSuccessors(node)
+                for childNode in kids:
+                    if childNode[0] not in closed:
+                        fringe.push([childNode,dirList + [childNode[1]]])
+    return dirList
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    closed = set()
+    startMoves = problem.getSuccessors(problem.getStartState())
+    fringe = util.Queue()
+    closed.add(problem.getStartState())
+    
+    # Set p the initial fringe set
+    for move in startMoves: fringe.push([move,[move[1]]])
+
+    # initialize the "foundSolution" bool
+    foundSolution = False
+
+    # if the startState is the goal, don't have to move at all 
+    if problem.isGoalState(problem.getStartState()):
+        return []
+
+    # what to do at each iteration..
+    while not foundSolution and len(fringe.list) > 0:
+        # Grab out the last added node..
+        currentNode = fringe.pop()
+        node = currentNode[0][0]
+        dirList = currentNode[1]
+
+        if problem.isGoalState(node):
+            print dirList
+            foundSolution = True
+        else:
+            if node not in closed:
+                closed.add(node)
+                kids = problem.getSuccessors(node)
+                for childNode in kids:
+                    if childNode[0] not in closed:
+                        fringe.push([childNode,dirList + [childNode[1]]])
+    return dirList
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    closed = set()
+    startMoves = problem.getSuccessors(problem.getStartState())
+    
+    def prioFunc(item):
+        return item[0][2]
+
+    fringe = util.PriorityQueueWithFunction(prioFunc)
+    closed.add(problem.getStartState())
+    
+    # Set p the initial fringe set
+    for move in startMoves: fringe.push([move,[move[1]]])
+
+    # initialize the "foundSolution" bool
+    foundSolution = False
+
+    # if the startState is the goal, don't have to move at all 
+    if problem.isGoalState(problem.getStartState()):
+        return []
+
+    # what to do at each iteration..
+    while not foundSolution and not fringe.isEmpty():
+        # Grab out the last added node..
+        currentNode = fringe.pop()
+        node = currentNode[0][0]
+        dirList = currentNode[1]
+
+        if problem.isGoalState(node):
+            print dirList
+            foundSolution = True
+        else:
+            if node not in closed:
+                closed.add(node)
+                kids = problem.getSuccessors(node)
+                for childNode in kids:
+                    fringe.push([childNode,dirList + [childNode[1]]])
+    return dirList
 
 def nullHeuristic(state, problem=None):
     """
